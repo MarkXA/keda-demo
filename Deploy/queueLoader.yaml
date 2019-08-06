@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-loader
+  labels:
+    app: queue-loader
+spec:
+  selector:
+    matchLabels:
+      app: queue-loader
+  template:
+    metadata:
+      labels:
+        app: queue-loader
+    spec:
+      containers:
+        - name: queueloader
+          image: mxacommonacr.azurecr.io/queueloader:v3
+          ports:
+            - containerPort: 80
+          env:
+            - name: FUNCTIONS_WORKER_RUNTIME
+              value: "dotnet"
+            - name: workQueue
+              value: "kedawork"
+            - name: outputQueue
+              value: "kedaoutput"
+            - name: statusBlob
+              value: "web/status.json"
+            - name: watcherCron
+              value: "*/5 * * * * *"
+            - name: sbConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: keda-secrets
+                  key: sbConnectionString
+            - name: storageConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: keda-secrets
+                  key: storageConnectionString
+      imagePullSecrets:
+        - name: acr-auth

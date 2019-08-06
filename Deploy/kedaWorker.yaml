@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keda-worker
+  labels:
+    app: keda-worker
+spec:
+  selector:
+    matchLabels:
+      app: keda-worker
+  template:
+    metadata:
+      labels:
+        app: keda-worker
+    spec:
+      containers:
+        - name: kedaworker
+          image: mxacommonacr.azurecr.io/kedaworker:v1
+          env:
+            - name: FUNCTIONS_WORKER_RUNTIME
+              value: "dotnet"
+            - name: workQueue
+              value: "kedawork"
+            - name: outputQueue
+              value: "kedaoutput"
+            - name: sbConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: keda-secrets
+                  key: sbConnectionString
+      imagePullSecrets:
+        - name: acr-auth
+      nodeSelector:
+        kubernetes.io/role: agent
+        beta.kubernetes.io/os: linux
+        type: virtual-kubelet
+      tolerations:
+        - key: virtual-kubelet.io/provider
+          operator: Exists
+        - key: azure.com/aci
+          effect: NoSchedule
