@@ -1,20 +1,20 @@
-$resourceGroupName = "shep-keda"
+$resourceGroupName = "mxa-keda"
 $locationName = "northeurope"
 
-$k8sClusterName = "shepkedak8s"
-$k8sNamespace = "shep-keda"
-$vnetName = "shep-keda-vnet"
+$k8sClusterName = "mxakedak8s"
+$k8sNamespace = "mxa-keda"
+$vnetName = "mxa-keda-vnet"
 $aksSubnetName = "aks-subnet"
 $virtualNodesSubnetName = "virtualnodes-subnet"
 
-$sbNamespaceName = "shepkedasb"
+$sbNamespaceName = "mxakedasb"
 $workQueueName = "kedawork"
 $outputQueueName = "kedaoutput"
 
-$storageName = "shepkedastorage"
+$storageName = "mxakedastorage"
 $webContainerName = "web"
 
-$acrServer = "shepcommonacr.azurecr.io"
+$acrServer = "mxacommonacr.azurecr.io"
 
 function ConvertTo-Object {
     ConvertFrom-Json ([String]::Join(" ", $args[0]))
@@ -102,7 +102,7 @@ az storage blob upload `
     --account-name $storageName
 az storage blob upload `
     --file .\status.json `
-    --name index.html `
+    --name status.json `
     --container-name $webContainerName `
     --account-name $storageName
 
@@ -117,7 +117,7 @@ $json = az servicebus namespace authorization-rule keys list `
     --resource-group $resourceGroupName
 $sbConnStr = (ConvertTo-Object $json).primaryConnectionString
 
-$json = az acr credential show --name shepcommonacr
+$json = az acr credential show --name mxacommonacr
 $acrUsername = (ConvertTo-Object $json).username
 $acrPassword = (ConvertTo-Object $json).passwords[0].value
 
